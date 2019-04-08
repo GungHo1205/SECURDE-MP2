@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Properties>
+        <Property name="csvLog.fileName">csvLog</Property>
+        <Property name="file-header">column1,column2,column3</Property>
+    </Properties>
+    <appender name="roll-by-time"
+        class="org.apache.log4j.rolling.RollingFileAppender">
+        <rollingPolicy class="org.apache.log4j.rolling.TimeBasedRollingPolicy">
+            <param name="FileNamePattern" value="target/log4j/roll-by-time/app.%d{HH-mm}.log.gz" />
+        </rollingPolicy>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss} %-5p - %m%n" />
+        </layout>
+    </appender>
+    <Loggers>
+        <Root level="debug" additivity="false">
+            <AppenderRef ref="csvFile" level="debug"/>
+        </Root>
+    </Loggers>
