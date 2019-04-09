@@ -245,10 +245,8 @@ public class MgmtUser extends javax.swing.JPanel {
             if (result == JOptionPane.YES_OPTION) {
                 String username = (String) tableModel.getValueAt(table.getSelectedRow(), 0);
                 if (state.equals("lock")) {
-                    System.out.println("Locking user: " + username);
-                    sqlite.lockAccount(username, 1);
+                    sqlite.lockAccount(username, 3);
                 } else {
-                    System.out.println("Unlocking user: " + username);
                     sqlite.lockAccount(username, 0);
                 }
             }

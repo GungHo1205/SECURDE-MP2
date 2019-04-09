@@ -1,7 +1,9 @@
 package View;
 
+import Model.User;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import javax.swing.JOptionPane;
 
 public class Login extends javax.swing.JPanel {
@@ -90,11 +92,7 @@ public class Login extends javax.swing.JPanel {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         //      frame.mainNav();  //Included in MP2
-        frame.loginAction(frame.main.sanitize(username.getText()), String.copyValueOf(password.getPassword()));
-        if (frame.main.logInAttempts == 3) {
-//            jButton2.setEnabled(false);
-            JOptionPane.showMessageDialog(null, "You have exceeded the maximum log in attempts!");
-        }
+        frame.loginAction(frame.main.sanitize(username.getText()), frame.main.sanitize(String.copyValueOf(password.getPassword())));
         username.setText("");
         password.setText("");
     }//GEN-LAST:event_jButton2ActionPerformed

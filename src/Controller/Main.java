@@ -8,6 +8,8 @@ import View.Frame;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -15,6 +17,7 @@ import java.util.Properties;
 import java.util.Random;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
+import javax.swing.JOptionPane;
 import javax.xml.bind.DatatypeConverter;
 
 public class Main extends Validation {
@@ -24,9 +27,12 @@ public class Main extends Validation {
     private int passLength = 0;
     private User LoggedInUsername;
     private String password; //text that was saved
-    private Validation validate;
+    public Validation validation;
     Properties prop = new Properties();
     InputStream input = null;
+    private String errorMessage;
+    StringWriter sw = new StringWriter();
+    PrintWriter pw = new PrintWriter(sw);
 
     public static void main(String[] args) {
         new Main().init();
@@ -36,7 +42,6 @@ public class Main extends Validation {
     public void init() {
         // Initialize a driver object
         sqlite = new SQLite();
-
 //        // Create a database
         sqlite.createNewDatabase();
 //        
@@ -128,6 +133,7 @@ public class Main extends Validation {
     }
 
     private String hashPassword(String password) {
+
         try {
             int iterations = 1; // random number of iterations to perform
             char[] chars = password.toCharArray();
@@ -137,12 +143,13 @@ public class Main extends Validation {
             byte[] hash = skf.generateSecret(spec).getEncoded();
             return iterations + ":" + bytesToHex(salt) + ":" + bytesToHex(hash);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            ex.printStackTrace(pw);
+            setErrorMessage(sw.toString()); // stack trace as a string
         }
         return null;
     }
 
-    private static boolean validatePassword(String originalPassword, String storedPassword) { // check if equal password
+    private boolean validatePassword(String originalPassword, String storedPassword) { // check if equal password
         try {
             String[] parts = storedPassword.split(":");
             int iterations = Integer.parseInt(parts[0]);
@@ -158,10 +165,11 @@ public class Main extends Validation {
             }
             return diff == 0; // true if the arrays are equal false if not
         } catch (Exception ex) {
-            System.out.println(ex.getMessage());;
+            ex.printStackTrace(pw);
+            setErrorMessage(sw.toString()); // stack trace as a string
         }
         return false;
-    }       
+    }
 
     private String bytesToHex(byte[] input) { // convert hexadecimal to byte[]
         return DatatypeConverter.printHexBinary(input);
@@ -206,7 +214,7 @@ public class Main extends Validation {
             sqlite.updatePassword(username, hashPassword(password));
             return true;
         } else {
-            
+
             return false;
         }
     }
@@ -214,10 +222,19 @@ public class Main extends Validation {
     public boolean loginUser(String username, String password) { // check login
         ArrayList<User> users = sqlite.getUsers();
         for (int ctr = 0; ctr < users.size(); ctr++) {
+            if (username.equals(users.get(ctr).getUsername()) && users.get(ctr).getLocked() == 3) {
+                JOptionPane.showMessageDialog(null, "Succeeded Log in Attempts");
+                return false;
+            }
             if (username.equals(users.get(ctr).getUsername())) { // check if username in list
                 if (validatePassword(password, users.get(ctr).getPassword())) { // check if password matches user password
                     saveLoggedInUser(users.get(ctr).getId(), users.get(ctr).getUsername(), users.get(ctr).getPassword(), users.get(ctr).getRole());
                     return true;
+                } else {
+                    int up = users.get(ctr).getLocked();
+                    up++;
+                    sqlite.updateLocked(username, up);
+                    return false;
                 }
             }
         }
@@ -250,13 +267,15 @@ public class Main extends Validation {
             System.out.println(prop.getProperty("ERROR500"));
 
         } catch (IOException ex) {
-            ex.printStackTrace();
+            ex.printStackTrace(pw);
+            setErrorMessage(sw.toString()); // stack trace as a string
         } finally {
             if (input != null) {
                 try {
                     input.close();
                 } catch (IOException e) {
-                    System.out.println(e.getMessage());;
+                    e.printStackTrace(pw);
+                    setErrorMessage(sw.toString()); // stack trace as a string
                 }
             }
         }
@@ -264,6 +283,9 @@ public class Main extends Validation {
     }
 
     public String getError(String error) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+
         try {
 
             input = getClass().getResourceAsStream("/properties/errorResource.properties");;
@@ -276,17 +298,39 @@ public class Main extends Validation {
             System.out.println(prop.getProperty("ERROR500"));
 
         } catch (IOException ex) {
-            ex.printStackTrace();
+            ex.printStackTrace(pw);
+            setErrorMessage(sw.toString()); // stack trace as a string
+            System.out.println(getErrorMessage());
         } finally {
             if (input != null) {
                 try {
                     input.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    e.printStackTrace(pw);
+                    setErrorMessage(sw.toString()); // stack trace as a string
+
                 }
             }
         }
         return prop.getProperty(error);
+    }
+
+    public void getErrorFromValidation() {
+        setErrorMessage(validation.getErrorMessage());
+    }
+
+    /**
+     * @return the errorMessage
+     */
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    /**
+     * @param errorMessage the errorMessage to set
+     */
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
     }
 }
 

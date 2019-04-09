@@ -4,6 +4,8 @@ import Model.History;
 import Model.Logs;
 import Model.Product;
 import Model.User;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -17,7 +19,9 @@ public class SQLite {
 
     public int DEBUG_MODE = 0;
     String driverURL = "jdbc:sqlite:" + "database.db";
-    private InetAddress ipAddress;
+    StringWriter sw = new StringWriter();
+    PrintWriter pw = new PrintWriter(sw);
+    public String errorMessage;
 
     public void createNewDatabase() {
         try (Connection conn = DriverManager.getConnection(driverURL)) {
@@ -26,6 +30,8 @@ public class SQLite {
                 System.out.println("Database database.db created.");
             }
         } catch (Exception ex) {
+            ex.printStackTrace(pw);
+            errorMessage = sw.toString(); // stack trace as a string
         }
     }
 
@@ -44,6 +50,8 @@ public class SQLite {
             stmt.execute(sql);
             System.out.println("Table history in database.db created.");
         } catch (Exception ex) {
+            ex.printStackTrace(pw);
+            errorMessage = sw.toString(); // stack trace as a string
         }
     }
 
@@ -61,6 +69,8 @@ public class SQLite {
             stmt.execute(sql);
             System.out.println("Table logs in database.db created.");
         } catch (Exception ex) {
+            ex.printStackTrace(pw);
+            errorMessage = sw.toString(); // stack trace as a string
         }
     }
 
@@ -77,6 +87,8 @@ public class SQLite {
             stmt.execute(sql);
             System.out.println("Table product in database.db created.");
         } catch (Exception ex) {
+            ex.printStackTrace(pw);
+            errorMessage = sw.toString(); // stack trace as a string
         }
     }
 
@@ -94,6 +106,9 @@ public class SQLite {
             stmt.execute(sql);
             System.out.println("Table users in database.db created.");
         } catch (Exception ex) {
+            ex.printStackTrace(pw);
+            errorMessage = sw.toString(); // stack trace as a string
+
         }
     }
 
@@ -105,6 +120,8 @@ public class SQLite {
             stmt.execute(sql);
             System.out.println("Table history in database.db dropped.");
         } catch (Exception ex) {
+            ex.printStackTrace(pw);
+            errorMessage = sw.toString(); // stack trace as a string
         }
     }
 
@@ -116,6 +133,8 @@ public class SQLite {
             stmt.execute(sql);
             System.out.println("Table logs in database.db dropped.");
         } catch (Exception ex) {
+            ex.printStackTrace(pw);
+            errorMessage = sw.toString(); // stack trace as a string
         }
     }
 
@@ -127,6 +146,8 @@ public class SQLite {
             stmt.execute(sql);
             System.out.println("Table product in database.db dropped.");
         } catch (Exception ex) {
+            ex.printStackTrace(pw);
+            errorMessage = sw.toString(); // stack trace as a string
         }
     }
 
@@ -138,7 +159,8 @@ public class SQLite {
             stmt.execute(sql);
             System.out.println("Table users in database.db dropped.");
         } catch (Exception ex) {
-            System.out.println(ex);
+            ex.printStackTrace(pw);
+            errorMessage = sw.toString(); // stack trace as a string
         }
 
     }
@@ -150,8 +172,8 @@ public class SQLite {
                 Statement stmt = conn.createStatement()) {
             stmt.execute(sql);
         } catch (Exception ex) {
-            System.out.println(ex);
-
+            ex.printStackTrace(pw);
+            errorMessage = sw.toString(); // stack trace as a string
         }
     }
 
@@ -162,6 +184,8 @@ public class SQLite {
                 Statement stmt = conn.createStatement()) {
             stmt.execute(sql);
         } catch (Exception ex) {
+            ex.printStackTrace(pw);
+            errorMessage = sw.toString(); // stack trace as a string
         }
     }
 
@@ -172,7 +196,8 @@ public class SQLite {
                 Statement stmt = conn.createStatement()) {
             stmt.execute(sql);
         } catch (Exception ex) {
-            System.out.println(ex);
+            ex.printStackTrace(pw);
+            errorMessage = sw.toString(); // stack trace as a string        
         }
     }
 
@@ -185,7 +210,9 @@ public class SQLite {
             stmt.executeUpdate();
 
         } catch (Exception ex) {
-            /* Log: Log exception */ }
+            ex.printStackTrace(pw);
+            errorMessage = sw.toString(); // stack trace as a string        
+        }
 
     }
 
@@ -203,6 +230,8 @@ public class SQLite {
 //      pstmt.setString(2, password);
 //      pstmt.executeUpdate();
         } catch (Exception ex) {
+            ex.printStackTrace(pw);
+            errorMessage = sw.toString(); // stack trace as a string
         }
     }
 
@@ -218,13 +247,35 @@ public class SQLite {
             stmt.executeUpdate();
             result = 1;
         } catch (Exception ex) {
-            /* Log: Log exception */ }
+            ex.printStackTrace(pw);
+            errorMessage = sw.toString(); // stack trace as a string        
+        }
         if (result == 1) {
             System.out.println("User: " + username + " changed role to ->" + role); // Debug
             // Log: User attempt counter set to N
         }
     }
+    public void updateLocked(String username, int locked) {
+        String sql = "UPDATE users SET locked = ? WHERE username = ?";
+        int result = 0;
+        System.out.println("test");
 
+        try (Connection conn = DriverManager.getConnection(driverURL);
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, locked);
+            stmt.setString(2, username);
+            stmt.executeUpdate();
+            result = 1;
+        } catch (Exception ex) {
+            ex.printStackTrace(pw);
+            errorMessage = sw.toString(); // stack trace as a string        
+        }
+        if (result == 1) {
+            System.out.println("User: " + username + " increased attemp counter" + locked); // Debug
+            // Log: User attempt counter set to N
+        }
+    }
+    
     public ArrayList<History> getHistory() {
         String sql = "SELECT id, username, name, stock, price, timestamp FROM history";
         ArrayList<History> histories = new ArrayList<History>();
@@ -262,7 +313,8 @@ public class SQLite {
                         rs.getString("timestamp")));
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            ex.printStackTrace(pw);
+            errorMessage = sw.toString(); // stack trace as a string
         }
         return logs;
     }
@@ -282,6 +334,8 @@ public class SQLite {
                         rs.getFloat("price")));
             }
         } catch (Exception ex) {
+            ex.printStackTrace(pw);
+            errorMessage = sw.toString(); // stack trace as a string
         }
         return products;
     }
@@ -302,7 +356,9 @@ public class SQLite {
                         rs.getInt("locked")));
             }
         } catch (Exception ex) {
-            System.out.println(ex);
+            ex.printStackTrace(pw);
+            errorMessage = sw.toString(); // stack trace as a string
+
         }
         return users;
     }
@@ -334,7 +390,8 @@ public class SQLite {
                 Statement stmt = conn.createStatement()) {
             stmt.execute(sql);
         } catch (Exception ex) {
-            System.out.println(ex);
+            ex.printStackTrace(pw);
+            errorMessage = sw.toString(); // stack trace as a string
         }
     }
 
@@ -347,6 +404,8 @@ public class SQLite {
             stmt.executeUpdate();
         } catch (Exception ex) {
             /* Log: Log exception */
+            ex.printStackTrace(pw);
+            errorMessage = sw.toString(); // stack trace as a string
         }
     }
 
@@ -359,7 +418,9 @@ public class SQLite {
             stmt.setString(2, username);
             stmt.executeUpdate();
         } catch (Exception ex) {
-            /* Log: Log exception */ }
+            ex.printStackTrace(pw);
+            errorMessage = sw.toString(); // stack trace as a string
+        }
     }
 
     public Product getProduct(String name) {
@@ -372,6 +433,8 @@ public class SQLite {
                     rs.getInt("stock"),
                     rs.getFloat("price"));
         } catch (Exception ex) {
+            ex.printStackTrace(pw);
+            errorMessage = sw.toString(); // stack trace as a string
         }
         return product;
     }
@@ -391,7 +454,8 @@ public class SQLite {
             }
             return true;
         } catch (Exception ex) {
-            System.out.println(ex);
+            ex.printStackTrace(pw);
+            errorMessage = sw.toString(); // stack trace as a string
 
         }
         return true;
@@ -405,7 +469,8 @@ public class SQLite {
             stmt.setString(2, username);
             stmt.executeUpdate();
         } catch (Exception ex) {
-
+            ex.printStackTrace(pw);
+            errorMessage = sw.toString(); // stack trace as a string
         }
 
     }
@@ -421,7 +486,9 @@ public class SQLite {
             stmt.setString(4, productName);
             stmt.executeUpdate();
         } catch (Exception ex) {
-            /* Log: Log exception */ }
+            ex.printStackTrace(pw);
+            errorMessage = sw.toString(); // stack trace as a string
+        }
     }
 
     public void deleteLogsTable() {
@@ -432,6 +499,8 @@ public class SQLite {
             stmt.execute(sql);
             System.out.println("Table logs in database.db truncated.");
         } catch (Exception ex) {
+            ex.printStackTrace(pw);
+            errorMessage = sw.toString(); // stack trace as a string
         }
     }
 //    public String searchUser(String username, String password) {

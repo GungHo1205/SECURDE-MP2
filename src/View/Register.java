@@ -109,7 +109,7 @@ public class Register extends javax.swing.JPanel {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         if (frame.main.validate(username.getText())) {
-            frame.registerAction(frame.main.sanitize(username.getText()), String.copyValueOf(password.getPassword()), String.copyValueOf(confpass.getPassword()));
+            frame.registerAction(frame.main.sanitize(username.getText()), frame.main.sanitize(String.copyValueOf(password.getPassword())), frame.main.sanitize(String.copyValueOf(confpass.getPassword())));
         }else{
             // put error here
         }

@@ -9,10 +9,13 @@ import Controller.Main;
 import Controller.SQLite;
 import Model.Product;
 import Model.User;
+import java.awt.Dimension;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
@@ -216,7 +219,7 @@ public class MgmtProduct extends javax.swing.JPanel {
         JTextField stockFld = new JTextField();
         JTextField priceFld = new JTextField();
 
-        designer(nameFld, "PRODUCT NAME");  
+        designer(nameFld, "PRODUCT NAME");
         designer(stockFld, "PRODUCT STOCK");
         designer(priceFld, "PRODUCT PRICE");
 
@@ -233,11 +236,38 @@ public class MgmtProduct extends javax.swing.JPanel {
                         sqlite.addProduct(nameFld.getText(), Integer.parseInt(stockFld.getText()), Double.parseDouble(priceFld.getText()));
                         sqlite.addHistory(user.getUsername(), nameFld.getText(), Integer.parseInt(stockFld.getText()), Double.parseDouble(priceFld.getText()), new Timestamp(new Date().getTime()).toString());
                         sqlite.addLogs("NOTICE", user.getUsername(), user.getUsername() + " added product " + nameFld.getText(), new Timestamp(new Date().getTime()).toString());
+                    } else {
+                        if (sqlite.DEBUG_MODE == 0) { // not in debug mode{
+                            JOptionPane.showMessageDialog(null, main.getError("ERROR201"), "Error", JOptionPane.ERROR_MESSAGE); // invalid input
+
+                        } else { // in debug mode
+                            JTextArea textArea = new JTextArea(main.getErrorMessage());
+                            JScrollPane scrollPane = new JScrollPane(textArea);
+                            textArea.setLineWrap(true);
+                            textArea.setWrapStyleWord(true);
+                            scrollPane.setPreferredSize(new Dimension(500, 500));
+                            JOptionPane.showMessageDialog(null, scrollPane, "Error",
+                                    JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                } else {
+                    if (sqlite.DEBUG_MODE == 0) { // not in debug mode{
+                        JOptionPane.showMessageDialog(null, main.getError("ERROR202"), "Error", JOptionPane.ERROR_MESSAGE); // invalid input
+
+                    } else { // in debug mode
+                        JTextArea textArea = new JTextArea(main.getErrorMessage());
+                        JScrollPane scrollPane = new JScrollPane(textArea);
+                        textArea.setLineWrap(true);
+                        textArea.setWrapStyleWord(true);
+                        scrollPane.setPreferredSize(new Dimension(500, 500));
+                        JOptionPane.showMessageDialog(null, scrollPane, "Error",
+                                JOptionPane.ERROR_MESSAGE);
                     }
                 }
             }
             init(user);
         }
+
         init(user);
     }//GEN-LAST:event_addBtnActionPerformed
 

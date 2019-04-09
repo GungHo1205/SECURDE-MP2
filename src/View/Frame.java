@@ -327,6 +327,8 @@ public class Frame extends javax.swing.JFrame {
                 frameView.show(Container, "loginPnl");
                 main.removeLoggedInUser();
                 JOptionPane.showMessageDialog(null, "Account Disabled!");
+                main.sqlite.addLogs("ERROR", username, username + " is being accessed encountered ERROR3 ", new Timestamp(new Date().getTime()).toString());
+
             }
             main.logInAttempts = 0;
         } else {

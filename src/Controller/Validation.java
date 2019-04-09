@@ -5,9 +5,8 @@
  */
 package Controller;
 
-import java.text.DecimalFormat;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 /**
  *
@@ -21,6 +20,9 @@ public class Validation {
     String slash = "/";
     String quote = "\"";
     String ampersand = "&";
+    StringWriter sw = new StringWriter();
+    PrintWriter pw = new PrintWriter(sw);
+    private String errorMessage;
 //    String escape = "['\"\\\\&<>]";
 //    Pattern regex = Pattern.compile("[$&+,:;=?@#|]+");
 //    Pattern pattern = Pattern.compile(escape);
@@ -35,6 +37,7 @@ public class Validation {
         System.out.println(v.validate("asdasdasdasdasdasdasdasdasdasdas")); // return false > 32
         System.out.println(v.validate(100000000)); // return false > 2 billion
         System.out.println(v.validate(100.101)); // false 3 decimals
+        System.out.println(v.validateDoubleSize("asd"));
     }
 
     public void test() {
@@ -93,27 +96,48 @@ public class Validation {
 
     public boolean validateIntSize(String input) {
         try {
-            return (Integer.parseInt(input) < 2_000_000_000 && input.length() < 32 && input.length() > 0);
+            return (Integer.parseInt(input) < 2_000_000_000 && input.length() < 32 && input.length() > 0 && !(Integer.parseInt(input) <0));
         } catch (NumberFormatException e) {
+            e.printStackTrace(pw);
+            setErrorMessage(sw.toString()); // stack trace as a string
             return false;
         }
     }
 
     public boolean validateDoubleSize(String input) {
+
         if (input.contains(".")) {
             int integerPlaces = input.indexOf('.');
             int decimalPlaces = input.length() - integerPlaces - 1;
             try {
-                return (Double.parseDouble(input) < 2_000_000_000.00 && input.length() < 32 && input.length() > 0 && decimalPlaces <= 2);
+                return (Double.parseDouble(input) < 2_000_000_000.00 && input.length() < 32 && input.length() > 0 && decimalPlaces <= 2 && !(Double.parseDouble(input) <0));
             } catch (NumberFormatException e) {
+                e.printStackTrace(pw);
+                setErrorMessage(sw.toString()); // stack trace as a string
                 return false;
             }
         } else {
             try {
-                return (Double.parseDouble(input) < 2_000_000_000.00 && input.length() < 32 && input.length() > 0);
+                return (Double.parseDouble(input) < 2_000_000_000.00 && input.length() < 32 && input.length() > 0  && !(Double.parseDouble(input) <0));
             } catch (NumberFormatException e) {
+                e.printStackTrace(pw);
+                setErrorMessage(sw.toString()); // stack trace as a string
                 return false;
             }
         }
+    }
+
+    /**
+     * @return the errorMessage
+     */
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    /**
+     * @param errorMessage the errorMessage to set
+     */
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
     }
 }
