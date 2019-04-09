@@ -2,11 +2,15 @@ package View;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.sql.Timestamp;
+import java.util.Date;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 
 public class Register extends javax.swing.JPanel {
 
     public Frame frame;
+    private String generatedCaptcha = "somerandomstringherehahaha";
 
     public Register() {
         initComponents();
@@ -16,16 +20,33 @@ public class Register extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        username1 = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
         username = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         jButton2 = new javax.swing.JButton();
         password = new javax.swing.JPasswordField();
         confpass = new javax.swing.JPasswordField();
+        captcha = new javax.swing.JTextField();
+        jLabel2 = new javax.swing.JLabel();
+        jButton3 = new javax.swing.JButton();
+
+        username1.setBackground(new java.awt.Color(240, 240, 240));
+        username1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        username1.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        username1.setBorder(javax.swing.BorderFactory.createTitledBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 2, true), "USERNAME", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 12))); // NOI18N
+        username1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                username1ActionPerformed(evt);
+            }
+        });
 
         jButton1.setBackground(new java.awt.Color(255, 255, 255));
         jButton1.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
         jButton1.setText("REGISTER");
+        jButton1.setAlignmentX(0.5F);
+        jButton1.setAutoscrolls(true);
+        jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -67,14 +88,32 @@ public class Register extends javax.swing.JPanel {
             }
         });
 
+        captcha.setBackground(new java.awt.Color(240, 240, 240));
+        captcha.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        captcha.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        captcha.setToolTipText("");
+        captcha.setBorder(javax.swing.BorderFactory.createTitledBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 2, true), "CAPTCHA", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 12)));
+        captcha.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                captchaActionPerformed(evt);
+            }
+        });
+
+        jLabel2.setText("CAPTCHA");
+
+        jButton3.setBackground(new java.awt.Color(255, 255, 255));
+        jButton3.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        jButton3.setText("GENERATE CAPTCHA");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jButton2)
@@ -82,11 +121,17 @@ public class Register extends javax.swing.JPanel {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(200, 200, 200)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(confpass)
+                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(captcha, javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(password)
+                    .addComponent(confpass)
                     .addComponent(username)
                     .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(200, 200, 200))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton3))
+                .addGap(32, 32, 32))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -98,20 +143,38 @@ public class Register extends javax.swing.JPanel {
                 .addGap(40, 40, 40)
                 .addComponent(username, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(password, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(confpass, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(password, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(confpass, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(captcha, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(4, 4, 4)
+                        .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
                 .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(64, Short.MAX_VALUE))
+                .addContainerGap())
         );
+
+        captcha.getAccessibleContext().setAccessibleName("");
+        jLabel2.getAccessibleContext().setAccessibleName("captchaString");
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        if (frame.main.validate(username.getText())) {
-            frame.registerAction(frame.main.sanitize(username.getText()), frame.main.sanitize(String.copyValueOf(password.getPassword())), frame.main.sanitize(String.copyValueOf(confpass.getPassword())));
-        }else{
-            // put error here
+
+        if ((captcha.getText().equals(generatedCaptcha))) {
+            if (frame.main.validate(username.getText())) {
+                frame.registerAction(frame.main.sanitize(username.getText()), frame.main.sanitize(String.copyValueOf(password.getPassword())), frame.main.sanitize(String.copyValueOf(confpass.getPassword())));
+            } else {
+                JOptionPane.showMessageDialog(null, "Incorrect inputs", "Error", JOptionPane.ERROR_MESSAGE); // invalid input
+            }
+
+        } else {
+            JOptionPane.showMessageDialog(null, "Incorrect Captcha", "Error", JOptionPane.ERROR_MESSAGE); // invalid input
+
         }
         System.out.println(frame.main.sanitize(username.getText()));
         System.out.println(frame.main.sanitize(String.copyValueOf(password.getPassword())));
@@ -153,13 +216,45 @@ public class Register extends javax.swing.JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_usernameActionPerformed
 
+    private void username1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_username1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_username1ActionPerformed
+
+    private void captchaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_captchaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_captchaActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // TODO add your handling code here:
+        generatedCaptcha = frame.main.randomString();
+        jLabel2.setText(generatedCaptcha);
+    }//GEN-LAST:event_jButton3ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextField captcha;
     private javax.swing.JPasswordField confpass;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPasswordField password;
     private javax.swing.JTextField username;
+    private javax.swing.JTextField username1;
     // End of variables declaration//GEN-END:variables
+
+    /**
+     * @return the generatedCaptcha
+     */
+    public String getGeneratedCaptcha() {
+        return generatedCaptcha;
+    }
+
+    /**
+     * @param generatedCaptcha the generatedCaptcha to set
+     */
+    public void setGeneratedCaptcha(String generatedCaptcha) {
+        this.generatedCaptcha = generatedCaptcha;
+    }
 }

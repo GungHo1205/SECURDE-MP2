@@ -10,7 +10,9 @@ import Controller.SQLite;
 import Model.History;
 import Model.Product;
 import Model.User;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
@@ -172,20 +174,20 @@ public class MgmtHistory extends javax.swing.JPanel {
         };
 
         int result = JOptionPane.showConfirmDialog(null, message, "SEARCH HISTORY", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null);
-
+        String search = main.sanitize(searchFld.getText()).toLowerCase();
         if (result == JOptionPane.OK_OPTION) {
 //          CLEAR TABLE
             for (int nCtr = tableModel.getRowCount(); nCtr > 0; nCtr--) {
                 tableModel.removeRow(0);
             }
-
+            sqlite.addLogs("Search History", user.getUsername(), user.getUsername() + " Searched for " + search, new Timestamp(new Date().getTime()).toString());
 //          LOAD CONTENTS
             ArrayList<History> history = sqlite.getHistory();
             for (int nCtr = 0; nCtr < history.size(); nCtr++) {
-                if (searchFld.getText().toLowerCase().contains(history.get(nCtr).getUsername().toLowerCase())
-                        || history.get(nCtr).getUsername().contains(searchFld.getText().toLowerCase())
-                        || searchFld.getText().toLowerCase().contains(history.get(nCtr).getName().toLowerCase())
-                        || history.get(nCtr).getName().toLowerCase().contains(searchFld.getText().toLowerCase())) {
+                if (main.deSanitize(search).contains(history.get(nCtr).getUsername().toLowerCase())
+                        || history.get(nCtr).getUsername().contains(main.deSanitize(search))
+                        || main.deSanitize(search).contains(history.get(nCtr).getName().toLowerCase())
+                        || history.get(nCtr).getName().toLowerCase().contains(main.deSanitize(search))) {
 
                     Product product = sqlite.getProduct(history.get(nCtr).getName());
                     tableModel.addRow(new Object[]{
@@ -202,6 +204,7 @@ public class MgmtHistory extends javax.swing.JPanel {
     }//GEN-LAST:event_searchBtnActionPerformed
 
     private void reloadBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reloadBtnActionPerformed
+        sqlite.addLogs("HISTORY", user.getUsername(), user.getUsername() + " Reloaded History", new Timestamp(new Date().getTime()).toString());
         init(getUser());
     }//GEN-LAST:event_reloadBtnActionPerformed
 

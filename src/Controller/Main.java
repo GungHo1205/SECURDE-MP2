@@ -10,6 +10,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -26,13 +30,13 @@ public class Main extends Validation {
     public int logInAttempts = 0;
     private int passLength = 0;
     private User LoggedInUsername;
-    private String password; //text that was saved
     public Validation validation;
     Properties prop = new Properties();
     InputStream input = null;
     private String errorMessage;
     StringWriter sw = new StringWriter();
     PrintWriter pw = new PrintWriter(sw);
+    private String generated;
 
     public static void main(String[] args) {
         new Main().init();
@@ -78,7 +82,6 @@ public class Main extends Validation {
         sqlite.addUser("staff", hashPassword("qwerty1234"), 3);
         sqlite.addUser("client1", hashPassword("qwerty1234"), 2);
         sqlite.addUser("client2", hashPassword("qwerty1234"), 2);
-        sqlite.addUser("disabled", hashPassword("qwerty1234"), 1);
 //        
 //        
 //        // Get users
@@ -315,6 +318,31 @@ public class Main extends Validation {
         return prop.getProperty(error);
     }
 
+    public String randomString() {
+        Random r = new Random();
+        ArrayList<Character> generatedString = new ArrayList<Character>();
+        String alphabet = "abcdefghijklmnopqrstuvwxyz1234567890";
+        setGenerated("");
+        for (int i = 0; i < 3; i++) {
+            generatedString.add(alphabet.charAt(r.nextInt(alphabet.length())));
+            for (char s : generatedString) {
+                setGenerated(getGenerated() + s + "");
+            }
+        }
+        return getGenerated();
+    }
+
+    public void copyFile() {
+        Path source = Paths.get("database.db");
+        Path destination = Paths.get("dist/database.db");
+        try {
+            Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING);
+            System.out.println("copied");
+        } catch (Exception e) {
+            System.out.println("not copied");
+        }
+    }
+
     public void getErrorFromValidation() {
         setErrorMessage(validation.getErrorMessage());
     }
@@ -331,6 +359,20 @@ public class Main extends Validation {
      */
     public void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
+    }
+
+    /**
+     * @return the generated
+     */
+    public String getGenerated() {
+        return generated;
+    }
+
+    /**
+     * @param generated the generated to set
+     */
+    public void setGenerated(String generated) {
+        this.generated = generated;
     }
 }
 

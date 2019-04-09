@@ -9,7 +9,9 @@ import Controller.Main;
 import Controller.SQLite;
 import Model.User;
 import java.io.OutputStream;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Properties;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
@@ -51,16 +53,30 @@ public class MgmtUser extends javax.swing.JPanel {
 //      LOAD CONTENTS
         ArrayList<User> users = sqlite.getUsers();
         setUser(user);
-        for (int nCtr = 0; nCtr < users.size(); nCtr++) {
-            if (users.get(nCtr).getRole() <= user.getRole()) {
-                tableModel.addRow(new Object[]{
-                    main.deSanitize(users.get(nCtr).getUsername()),
-                    users.get(nCtr).getPassword(),
-                    users.get(nCtr).getRole(),
-                    users.get(nCtr).getLocked()});
+        
+        if(main.getLoggedInUser().getRole()==2){
+            for (int nCtr = 0; nCtr < users.size(); nCtr++) {
+                if (users.get(nCtr).getUsername().equals(main.getLoggedInUser().getUsername())) {
+                    tableModel.addRow(new Object[]{
+                        main.deSanitize(users.get(nCtr).getUsername()),
+                        users.get(nCtr).getPassword(),
+                        users.get(nCtr).getRole(),
+                        users.get(nCtr).getLocked()});
+                }
+            }
+        }else{
+            for (int nCtr = 0; nCtr < users.size(); nCtr++) {
+                if (users.get(nCtr).getRole() <= user.getRole()) {
+                    tableModel.addRow(new Object[]{
+                        main.deSanitize(users.get(nCtr).getUsername()),
+                        users.get(nCtr).getPassword(),
+                        users.get(nCtr).getRole(),
+                        users.get(nCtr).getLocked()});
+                }
             }
         }
 
+        
         if (user.getRole() != 5) {
             editRoleBtn.setVisible(false);
             lockBtn.setVisible(false);
@@ -196,10 +212,10 @@ public class MgmtUser extends javax.swing.JPanel {
             String[] options = {"2-CLIENT", "3-STAFF", "4-MANAGER"};
             JComboBox optionList = new JComboBox(options);
 
-            optionList.setSelectedIndex((int) tableModel.getValueAt(table.getSelectedRow(), 2) - 1);
+            optionList.setSelectedIndex(2);
 
             String result = (String) JOptionPane.showInputDialog(null, "USER: " + tableModel.getValueAt(table.getSelectedRow(), 0),
-                    "EDIT USER ROLE", JOptionPane.QUESTION_MESSAGE, null, options, options[(int) tableModel.getValueAt(table.getSelectedRow(), 2) - 1]);
+                    "EDIT USER ROLE", JOptionPane.QUESTION_MESSAGE, null, options, options[2]);
 
             if (result != null) {
                 System.out.println(tableModel.getValueAt(table.getSelectedRow(), 0));
@@ -209,6 +225,7 @@ public class MgmtUser extends javax.swing.JPanel {
                 System.out.println("User:" + selectedUsername);
                 System.out.println("New Role:" + newRole);
                 sqlite.updateRole(selectedUsername, newRole);
+                sqlite.addLogs("EDIT ROLE", user.getUsername(), user.getUsername() + " Edited Role to " + newRole, new Timestamp(new Date().getTime()).toString());
 //                if(newRole == 1){
 //                    sqlite.lockAccount(selectedUsername,3);
 //                }
@@ -228,6 +245,7 @@ public class MgmtUser extends javax.swing.JPanel {
                 String deleteUser = (String) tableModel.getValueAt(table.getSelectedRow(), 0);
                 System.out.println("User to delete: " + deleteUser);
                 sqlite.removeUser(deleteUser);
+                sqlite.addLogs("DELETE USER", user.getUsername(), user.getUsername() + " Deleted User " + deleteUser, new Timestamp(new Date().getTime()).toString());
             }
             init(user);
         }
@@ -246,6 +264,7 @@ public class MgmtUser extends javax.swing.JPanel {
                 String username = (String) tableModel.getValueAt(table.getSelectedRow(), 0);
                 if (state.equals("lock")) {
                     sqlite.lockAccount(username, 3);
+                    sqlite.addLogs("LOCK USER", user.getUsername(), user.getUsername() + " Locked User: "+ username, new Timestamp(new Date().getTime()).toString());
                 } else {
                     sqlite.lockAccount(username, 0);
                 }
@@ -274,17 +293,21 @@ public class MgmtUser extends javax.swing.JPanel {
 
                 String username = (String) tableModel.getValueAt(table.getSelectedRow(), 0);
                 if (!(username.equals(user.getUsername())) && user.getRole() != 5) {
-                    JOptionPane.showMessageDialog(null, "not ur acc", "Error", JOptionPane.ERROR_MESSAGE); // does not match
+                    JOptionPane.showMessageDialog(null, "Not your account", "Error", JOptionPane.ERROR_MESSAGE); // does not match
                 } else {
                     if (password.getText().equals(confpass.getText())) {
-                        if (main.updatePassword(username, password.getText() + "")) {
+                        if (main.updatePassword(main.sanitize(username), main.sanitize(password.getText() + ""))) {
                             JOptionPane.showMessageDialog(null, "Succesfully Changed Password!");
+                            sqlite.addLogs("CHANGE PASS", user.getUsername(), user.getUsername() + " Changed password for " + username, new Timestamp(new Date().getTime()).toString());
                         } else if (!(main.checkRequiredMinPassword(password.getText() + ""))) {
                             JOptionPane.showMessageDialog(null, main.getError("ERROR0"), "Error", JOptionPane.ERROR_MESSAGE);      	// invalid combo
+                            sqlite.addLogs("CHANGE PASS", user.getUsername(), user.getUsername() + " Password did not reach minimum requirements ", new Timestamp(new Date().getTime()).toString());
                         } else {
                             JOptionPane.showMessageDialog(null, main.getError("ERROR1"), "Error", JOptionPane.ERROR_MESSAGE); // invalid input
+                            sqlite.addLogs("CHANGE PASS", user.getUsername(), user.getUsername() + " Invalid Input", new Timestamp(new Date().getTime()).toString());
                         }
                     } else {
+                        sqlite.addLogs("CHANGE PASS", user.getUsername(), user.getUsername() + " Passwords did not match", new Timestamp(new Date().getTime()).toString());
                         JOptionPane.showMessageDialog(null, main.getError("ERROR2"), "Error", JOptionPane.ERROR_MESSAGE); // does not match
                     }
                 }

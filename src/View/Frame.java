@@ -13,6 +13,7 @@ public class Frame extends javax.swing.JFrame {
 
     public Frame() {
         initComponents();
+        
     }
 
     @SuppressWarnings("unchecked")
@@ -29,6 +30,7 @@ public class Frame extends javax.swing.JFrame {
         staffBtn = new javax.swing.JButton();
         clientBtn = new javax.swing.JButton();
         logoutBtn = new javax.swing.JButton();
+        displayUser = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(153, 153, 153));
@@ -104,6 +106,9 @@ public class Frame extends javax.swing.JFrame {
             }
         });
 
+        displayUser.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        displayUser.setText("jLabel2");
+
         javax.swing.GroupLayout NavigationLayout = new javax.swing.GroupLayout(Navigation);
         Navigation.setLayout(NavigationLayout);
         NavigationLayout.setHorizontalGroup(
@@ -118,6 +123,10 @@ public class Frame extends javax.swing.JFrame {
                     .addComponent(clientBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(logoutBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
+            .addGroup(NavigationLayout.createSequentialGroup()
+                .addGap(24, 24, 24)
+                .addComponent(displayUser, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(27, Short.MAX_VALUE))
         );
         NavigationLayout.setVerticalGroup(
             NavigationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -132,7 +141,9 @@ public class Frame extends javax.swing.JFrame {
                 .addComponent(staffBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(clientBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 139, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 40, Short.MAX_VALUE)
+                .addComponent(displayUser, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
                 .addComponent(logoutBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -253,7 +264,7 @@ public class Frame extends javax.swing.JFrame {
         Content.add(managerHomePnl, "managerHomePnl");
         Content.add(staffHomePnl, "staffHomePnl");
         Content.add(clientHomePnl, "clientHomePnl");
-
+        
         this.setVisible(true);
     }
 
@@ -299,6 +310,7 @@ public class Frame extends javax.swing.JFrame {
         clientBtn.setVisible(false);
 
         if (main.loginUser(username, password)) {
+            displayUser.setText("Welcome "+main.getLoggedInUser().getUsername()+"!");
             frameView.show(Container, "homePnl");
             contentView.show(Content, "adminHomePnl");
             setUser(main.getLoggedInUser());
@@ -346,6 +358,7 @@ public class Frame extends javax.swing.JFrame {
     private javax.swing.JPanel Navigation;
     private javax.swing.JButton adminBtn;
     private javax.swing.JButton clientBtn;
+    private javax.swing.JLabel displayUser;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton logoutBtn;
     private javax.swing.JButton managerBtn;
