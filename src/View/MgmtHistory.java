@@ -5,6 +5,7 @@
  */
 package View;
 
+import Controller.Main;
 import Controller.SQLite;
 import Model.History;
 import Model.Product;
@@ -23,10 +24,11 @@ public class MgmtHistory extends javax.swing.JPanel {
     public SQLite sqlite;
     public DefaultTableModel tableModel;
     private User user;
-
-    public MgmtHistory(SQLite sqlite) {
+    public Main main;
+    public MgmtHistory(SQLite sqlite, Main main) {
         initComponents();
         this.sqlite = sqlite;
+        this.main = main;
         tableModel = (DefaultTableModel) table.getModel();
         table.getTableHeader().setFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, 14));
         javax.swing.table.DefaultTableCellRenderer rightAlign = new javax.swing.table.DefaultTableCellRenderer();

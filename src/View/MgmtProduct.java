@@ -5,6 +5,7 @@
  */
 package View;
 
+import Controller.Main;
 import Controller.SQLite;
 import Model.Product;
 import Model.User;
@@ -12,7 +13,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
@@ -25,10 +25,12 @@ public class MgmtProduct extends javax.swing.JPanel {
     public SQLite sqlite;
     public DefaultTableModel tableModel;
     private User user;
+    public Main main;
 
-    public MgmtProduct(SQLite sqlite) {
+    public MgmtProduct(SQLite sqlite, Main main) {
         initComponents();
         this.sqlite = sqlite;
+        this.main = main;
         tableModel = (DefaultTableModel) table.getModel();
         table.getTableHeader().setFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, 14));
 
@@ -214,7 +216,7 @@ public class MgmtProduct extends javax.swing.JPanel {
         JTextField stockFld = new JTextField();
         JTextField priceFld = new JTextField();
 
-        designer(nameFld, "PRODUCT NAME");
+        designer(nameFld, "PRODUCT NAME");  
         designer(stockFld, "PRODUCT STOCK");
         designer(priceFld, "PRODUCT PRICE");
 
@@ -225,13 +227,15 @@ public class MgmtProduct extends javax.swing.JPanel {
         int result = JOptionPane.showConfirmDialog(null, message, "ADD PRODUCT", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null);
 
         if (result == JOptionPane.OK_OPTION) {
-            System.out.println(nameFld.getText());
-            System.out.println(stockFld.getText());
-            System.out.println(priceFld.getText());
-            sqlite.addProduct(nameFld.getText(), Integer.parseInt(stockFld.getText()), Double.parseDouble(priceFld.getText()));
-            sqlite.addHistory(user.getUsername(), nameFld.getText(), Integer.parseInt(stockFld.getText()),Double.parseDouble(priceFld.getText()), new Timestamp(new Date().getTime()).toString());
-            sqlite.addLogs("NOTICE", user.getUsername(), user.getUsername() + " added product " + nameFld.getText(), new Timestamp(new Date().getTime()).toString());
-
+            if (main.validateStringSize(nameFld.getText())) {
+                if (main.validateIntSize(stockFld.getText())) {
+                    if (main.validateDoubleSize(priceFld.getText())) {
+                        sqlite.addProduct(nameFld.getText(), Integer.parseInt(stockFld.getText()), Double.parseDouble(priceFld.getText()));
+                        sqlite.addHistory(user.getUsername(), nameFld.getText(), Integer.parseInt(stockFld.getText()), Double.parseDouble(priceFld.getText()), new Timestamp(new Date().getTime()).toString());
+                        sqlite.addLogs("NOTICE", user.getUsername(), user.getUsername() + " added product " + nameFld.getText(), new Timestamp(new Date().getTime()).toString());
+                    }
+                }
+            }
             init(user);
         }
         init(user);
@@ -259,7 +263,7 @@ public class MgmtProduct extends javax.swing.JPanel {
                 System.out.println(stockFld.getText());
                 System.out.println(priceFld.getText());
                 sqlite.updateProduct((String) tableModel.getValueAt(table.getSelectedRow(), 0), nameFld.getText(), Integer.parseInt(stockFld.getText()), Double.parseDouble(priceFld.getText()));
-                sqlite.addHistory(user.getUsername(), nameFld.getText(), Integer.parseInt(stockFld.getText()),  Double.parseDouble(priceFld.getText()), new Timestamp(new Date().getTime()).toString());
+                sqlite.addHistory(user.getUsername(), nameFld.getText(), Integer.parseInt(stockFld.getText()), Double.parseDouble(priceFld.getText()), new Timestamp(new Date().getTime()).toString());
 
                 if (tableModel.getValueAt(table.getSelectedRow(), 0) != nameFld.getText()) {
                     sqlite.addLogs("NOTICE", user.getUsername(), user.getUsername() + " edited product " + tableModel.getValueAt(table.getSelectedRow(), 0) + " to " + nameFld.getText(), new Timestamp(new Date().getTime()).toString());

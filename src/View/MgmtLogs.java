@@ -5,6 +5,7 @@
  */
 package View;
 
+import Controller.Main;
 import Controller.SQLite;
 import Model.Logs;
 import Model.User;
@@ -20,10 +21,11 @@ public class MgmtLogs extends javax.swing.JPanel {
     public SQLite sqlite;
     public DefaultTableModel tableModel;
     private User user;
-
-    public MgmtLogs(SQLite sqlite) {
+    public Main main;
+    public MgmtLogs(SQLite sqlite, Main main) {
         initComponents();
         this.sqlite = sqlite;
+        this.main = main;
         tableModel = (DefaultTableModel) table.getModel();
         table.getTableHeader().setFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, 14));
 

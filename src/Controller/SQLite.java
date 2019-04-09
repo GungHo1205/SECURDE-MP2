@@ -10,7 +10,6 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.io.File;
 import java.net.InetAddress;
 import java.sql.PreparedStatement;
 
@@ -145,12 +144,14 @@ public class SQLite {
     }
 
     public void addHistory(String username, String name, int stock, double price, String timestamp) {
-        String sql = "INSERT INTO history(username,name,stock,price,timestamp) VALUES('" + username + "','" + name + "','" + stock + "','" + price + "','" +timestamp + "')";
+        String sql = "INSERT INTO history(username,name,stock,price,timestamp) VALUES('" + username + "','" + name + "','" + stock + "','" + price + "','" + timestamp + "')";
 
         try (Connection conn = DriverManager.getConnection(driverURL);
                 Statement stmt = conn.createStatement()) {
             stmt.execute(sql);
         } catch (Exception ex) {
+            System.out.println(ex);
+
         }
     }
 
@@ -171,6 +172,7 @@ public class SQLite {
                 Statement stmt = conn.createStatement()) {
             stmt.execute(sql);
         } catch (Exception ex) {
+            System.out.println(ex);
         }
     }
 
@@ -181,6 +183,7 @@ public class SQLite {
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, productName);
             stmt.executeUpdate();
+
         } catch (Exception ex) {
             /* Log: Log exception */ }
 
@@ -402,7 +405,8 @@ public class SQLite {
             stmt.setString(2, username);
             stmt.executeUpdate();
         } catch (Exception ex) {
-            /* Log: Log exception */ }
+
+        }
 
     }
 

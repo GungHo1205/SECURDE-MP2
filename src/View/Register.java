@@ -7,7 +7,7 @@ import javax.swing.JOptionPane;
 public class Register extends javax.swing.JPanel {
 
     public Frame frame;
-    
+
     public Register() {
         initComponents();
     }
@@ -36,6 +36,11 @@ public class Register extends javax.swing.JPanel {
         username.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         username.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         username.setBorder(javax.swing.BorderFactory.createTitledBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 2, true), "USERNAME", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 12))); // NOI18N
+        username.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                usernameActionPerformed(evt);
+            }
+        });
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 48)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -103,7 +108,14 @@ public class Register extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        frame.registerAction(username.getText(), String.copyValueOf(password.getPassword()), String.copyValueOf(confpass.getPassword()));
+        if (frame.main.validate(username.getText())) {
+            frame.registerAction(frame.main.sanitize(username.getText()), String.copyValueOf(password.getPassword()), String.copyValueOf(confpass.getPassword()));
+        }else{
+            // put error here
+        }
+        System.out.println(frame.main.sanitize(username.getText()));
+        System.out.println(frame.main.sanitize(String.copyValueOf(password.getPassword())));
+        System.out.println(frame.main.sanitize(String.copyValueOf(confpass.getPassword())));
         username.setText("");
         password.setText("");
         confpass.setText("");
@@ -137,7 +149,11 @@ public class Register extends javax.swing.JPanel {
 
     }//GEN-LAST:event_confpassActionPerformed
 
-    
+    private void usernameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_usernameActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_usernameActionPerformed
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPasswordField confpass;
     private javax.swing.JButton jButton1;

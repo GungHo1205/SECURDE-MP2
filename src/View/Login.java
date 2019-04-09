@@ -90,7 +90,7 @@ public class Login extends javax.swing.JPanel {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         //      frame.mainNav();  //Included in MP2
-        frame.loginAction(username.getText(), String.copyValueOf(password.getPassword()));
+        frame.loginAction(frame.main.sanitize(username.getText()), String.copyValueOf(password.getPassword()));
         if (frame.main.logInAttempts == 3) {
 //            jButton2.setEnabled(false);
             JOptionPane.showMessageDialog(null, "You have exceeded the maximum log in attempts!");

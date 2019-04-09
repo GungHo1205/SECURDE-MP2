@@ -158,10 +158,10 @@ public class Main extends Validation {
             }
             return diff == 0; // true if the arrays are equal false if not
         } catch (Exception ex) {
-            ex.printStackTrace();
+            System.out.println(ex.getMessage());;
         }
         return false;
-    }
+    }       
 
     private String bytesToHex(byte[] input) { // convert hexadecimal to byte[]
         return DatatypeConverter.printHexBinary(input);
@@ -206,6 +206,7 @@ public class Main extends Validation {
             sqlite.updatePassword(username, hashPassword(password));
             return true;
         } else {
+            
             return false;
         }
     }
@@ -235,29 +236,6 @@ public class Main extends Validation {
         this.LoggedInUsername = null;
     }
 
-    public String hidePassword(String rawPass) {
-        passLength = rawPass.length();
-        String asterisks = "";
-        for (int i = 0; i < passLength; i++) {
-            asterisks += "*";
-        }
-        System.out.println(password);
-        return asterisks;
-    }
-
-    public String savePassword(String rawPass) {
-        if (rawPass.length() > passLength) {
-            for (int i = 0; i < rawPass.length(); i++) {
-                if (rawPass.charAt(i) != '*') {
-                    password += rawPass.charAt(i);
-                }
-            }
-        } else if (rawPass.length() < passLength) {
-            password = password.substring(0, rawPass.length());
-        }
-        return password;
-    }
-
     public void loadResources() {
 
         try {
@@ -278,7 +256,7 @@ public class Main extends Validation {
                 try {
                     input.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    System.out.println(e.getMessage());;
                 }
             }
         }

@@ -5,6 +5,7 @@
  */
 package Controller;
 
+import java.text.DecimalFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,9 +31,10 @@ public class Validation {
         v.deSanitize(desanitize);
         String desanitizes = v.sanitize("<script> console.alert('XSS'); console.log('HACKED')&lg&gt&amp;</script>");
         v.deSanitize(desanitizes);
-        System.out.println(v.validateStringSize("asdasdasdasdasdasdasdasdasdasdas")); // return false > 32
-        System.out.println(v.validateIntSize("asdasdasdasdasdasdasdasdasdasdas")); // return false > 32
-        System.out.println(v.validateIntSize("100000000000000")); // return false > 2 billion
+        System.out.println(v.validate("asdasdasdasdasdasdasdasdasdasdas")); // return false > 32
+        System.out.println(v.validate("asdasdasdasdasdasdasdasdasdasdas")); // return false > 32
+        System.out.println(v.validate(100000000)); // return false > 2 billion
+        System.out.println(v.validate(100.101)); // false 3 decimals
     }
 
     public void test() {
@@ -41,12 +43,15 @@ public class Validation {
 
     public boolean validate(Object input) {
         if (input instanceof String) {
+            input = sanitize((String) input);
             validated = validateStringSize((String) input);
             System.out.println(validateStringSize((String) input));
             return validated;
         } else if (input instanceof Integer) {
-            validated = validateIntSize((String) input);
+            validated = validateIntSize(Integer.toString((int) input));
             return validated;
+        } else if (input instanceof Double) {
+            validated = validateDoubleSize(Double.toString((double) input));
         }
         return validated;
     }
@@ -82,16 +87,33 @@ public class Validation {
 //    }
 
     public boolean validateStringSize(String input) {
-        
-        return (input.length() < 32);
+
+        return (input.length() < 32) && input.length() > 0;
     }
 
     public boolean validateIntSize(String input) {
         try {
-            return (Integer.parseInt(input) < 2_000_000_000 && input.length() < 32);
+            return (Integer.parseInt(input) < 2_000_000_000 && input.length() < 32 && input.length() > 0);
         } catch (NumberFormatException e) {
             return false;
         }
     }
 
+    public boolean validateDoubleSize(String input) {
+        if (input.contains(".")) {
+            int integerPlaces = input.indexOf('.');
+            int decimalPlaces = input.length() - integerPlaces - 1;
+            try {
+                return (Double.parseDouble(input) < 2_000_000_000.00 && input.length() < 32 && input.length() > 0 && decimalPlaces <= 2);
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        } else {
+            try {
+                return (Double.parseDouble(input) < 2_000_000_000.00 && input.length() < 32 && input.length() > 0);
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
+    }
 }
