@@ -168,10 +168,16 @@ public class SQLite {
     }
 
     public void addHistory(String username, String name, int stock, double price, String timestamp) {
-        String sql = "INSERT INTO history(username,name,stock,price,timestamp) VALUES('" + username + "','" + name + "','" + stock + "','" + price + "','" + timestamp + "')";
+        String sql = "INSERT INTO history(username,name,stock,price,timestamp) VALUES(?,?,?,?,?)";
 
         try (Connection conn = DriverManager.getConnection(driverURL);
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, username);
+            stmt.setString(2, name);
+            stmt.setInt(3, stock);
+            stmt.setDouble(4, price);
+            stmt.setString(5, timestamp);
+
             stmt.executeUpdate();
         } catch (Exception ex) {/* Log: Log exception */
             ex.printStackTrace(pw);
@@ -180,10 +186,14 @@ public class SQLite {
     }
 
     public void addLogs(String event, String username, String desc, String timestamp) {
-        String sql = "INSERT INTO logs(event,username,desc,timestamp) VALUES('" + event + "','" + username + "','" + desc + "','" + timestamp + "')";
+        String sql = "INSERT INTO logs(event,username,desc,timestamp) VALUES(?,?,?,?)";
 
         try (Connection conn = DriverManager.getConnection(driverURL);
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, event);
+            stmt.setString(2, username);
+            stmt.setString(3, desc);
+            stmt.setString(4, timestamp);
             stmt.executeUpdate();
         } catch (Exception ex) {/* Log: Log exception */
             ex.printStackTrace(pw);
@@ -192,10 +202,13 @@ public class SQLite {
     }
 
     public void addProduct(String name, int stock, double price) {
-        String sql = "INSERT INTO product(name,stock,price) VALUES('" + name + "','" + stock + "','" + price + "')";
+        String sql = "INSERT INTO product(name,stock,price) VALUES(?,?,?)";
 
         try (Connection conn = DriverManager.getConnection(driverURL);
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, name);
+            stmt.setInt(2, stock);
+            stmt.setDouble(3, price);
             stmt.executeUpdate();
         } catch (Exception ex) {
             ex.printStackTrace(pw);
@@ -290,7 +303,7 @@ public class SQLite {
                         rs.getString("username"),
                         rs.getString("name"),
                         rs.getInt("stock"),
-                        rs.getInt("price"),
+                        rs.getDouble("price"),
                         rs.getString("timestamp")));
             }
         } catch (Exception ex) {

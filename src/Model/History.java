@@ -25,7 +25,7 @@ public class History {
 
     private SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
 
-    public History(String username, String name, int stock, int price) {
+    public History(String username, String name, int stock, double price) {
         this.username = username;
         this.name = name;
         this.stock = stock;
@@ -33,7 +33,7 @@ public class History {
         this.price = price;
     }
 
-    public History(int id, String username, String name, int stock, int price, String timestamp) {
+    public History(int id, String username, String name, int stock, double price, String timestamp) {
         this.id = id;
         this.username = username;
         this.name = name;

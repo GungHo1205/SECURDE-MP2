@@ -13,7 +13,7 @@ public class Frame extends javax.swing.JFrame {
 
     public Frame() {
         initComponents();
-        
+
     }
 
     @SuppressWarnings("unchecked")
@@ -264,7 +264,7 @@ public class Frame extends javax.swing.JFrame {
         Content.add(managerHomePnl, "managerHomePnl");
         Content.add(staffHomePnl, "staffHomePnl");
         Content.add(clientHomePnl, "clientHomePnl");
-        
+
         this.setVisible(true);
     }
 
@@ -310,10 +310,11 @@ public class Frame extends javax.swing.JFrame {
         clientBtn.setVisible(false);
 
         if (main.loginUser(username, password)) {
-            displayUser.setText("Welcome "+main.getLoggedInUser().getUsername()+"!");
+            displayUser.setText("Welcome " + main.getLoggedInUser().getUsername() + "!");
             frameView.show(Container, "homePnl");
             contentView.show(Content, "adminHomePnl");
             setUser(main.getLoggedInUser());
+            main.sqlite.addLogs("LOGIN", username, username + " has logged in", new Timestamp(new Date().getTime()).toString());
             if (main.getLoggedInUser().getRole() == 5) {
                 adminBtn.setVisible(true);
                 adminHomePnl.setUser(user);
