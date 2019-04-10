@@ -53,8 +53,8 @@ public class MgmtUser extends javax.swing.JPanel {
 //      LOAD CONTENTS
         ArrayList<User> users = sqlite.getUsers();
         setUser(user);
-        
-        if(main.getLoggedInUser().getRole()==2){
+
+        if (main.getLoggedInUser().getRole() == 2) {
             for (int nCtr = 0; nCtr < users.size(); nCtr++) {
                 if (users.get(nCtr).getUsername().equals(main.getLoggedInUser().getUsername())) {
                     tableModel.addRow(new Object[]{
@@ -64,7 +64,7 @@ public class MgmtUser extends javax.swing.JPanel {
                         users.get(nCtr).getLocked()});
                 }
             }
-        }else{
+        } else {
             for (int nCtr = 0; nCtr < users.size(); nCtr++) {
                 if (users.get(nCtr).getRole() <= user.getRole()) {
                     tableModel.addRow(new Object[]{
@@ -76,7 +76,6 @@ public class MgmtUser extends javax.swing.JPanel {
             }
         }
 
-        
         if (user.getRole() != 5) {
             editRoleBtn.setVisible(false);
             lockBtn.setVisible(false);
@@ -242,10 +241,17 @@ public class MgmtUser extends javax.swing.JPanel {
             int result = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete " + tableModel.getValueAt(table.getSelectedRow(), 0) + "?", "DELETE USER", JOptionPane.YES_NO_OPTION);
 
             if (result == JOptionPane.YES_OPTION) {
-                String deleteUser = (String) tableModel.getValueAt(table.getSelectedRow(), 0);
-                System.out.println("User to delete: " + deleteUser);
-                sqlite.removeUser(deleteUser);
-                sqlite.addLogs("DELETE USER", user.getUsername(), user.getUsername() + " Deleted User " + deleteUser, new Timestamp(new Date().getTime()).toString());
+                JPasswordField pf = new JPasswordField();
+                int confirm = JOptionPane.showConfirmDialog(null, pf, "Enter Password", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+                if (confirm == JOptionPane.OK_OPTION && main.validatePassword(main.sanitize((String.copyValueOf(pf.getPassword()))), user.getPassword())) {
+                    String deleteUser = (String) tableModel.getValueAt(table.getSelectedRow(), 0);
+                    System.out.println("User to delete: " + deleteUser);
+                    sqlite.removeUser(deleteUser);
+                    sqlite.addLogs("DELETE USER", user.getUsername(), user.getUsername() + " Deleted User " + deleteUser, new Timestamp(new Date().getTime()).toString());
+                } else if (confirm == JOptionPane.OK_CANCEL_OPTION) {
+                } else {
+                    JOptionPane.showMessageDialog(null, "wrong password", "ERROR", JOptionPane.ERROR_MESSAGE);
+                }
             }
             init(user);
         }
@@ -254,19 +260,26 @@ public class MgmtUser extends javax.swing.JPanel {
     private void lockBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lockBtnActionPerformed
         if (table.getSelectedRow() >= 0) {
             String state = "lock";
-            if ("1".equals(tableModel.getValueAt(table.getSelectedRow(), 3) + "")) {
+            if ("3".equals(tableModel.getValueAt(table.getSelectedRow(), 3) + "")) {
                 state = "unlock";
             }
 
             int result = JOptionPane.showConfirmDialog(null, "Are you sure you want to " + state + " " + tableModel.getValueAt(table.getSelectedRow(), 0) + "?", "DELETE USER", JOptionPane.YES_NO_OPTION);
 
             if (result == JOptionPane.YES_OPTION) {
-                String username = (String) tableModel.getValueAt(table.getSelectedRow(), 0);
-                if (state.equals("lock")) {
-                    sqlite.lockAccount(username, 3);
-                    sqlite.addLogs("LOCK USER", user.getUsername(), user.getUsername() + " Locked User: "+ username, new Timestamp(new Date().getTime()).toString());
+                JPasswordField pf = new JPasswordField();
+                int confirm = JOptionPane.showConfirmDialog(null, pf, "Enter Password", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+                if (confirm == JOptionPane.OK_OPTION && main.validatePassword(main.sanitize((String.copyValueOf(pf.getPassword()))), user.getPassword())) {
+                    String username = (String) tableModel.getValueAt(table.getSelectedRow(), 0);
+                    if (state.equals("lock")) {
+                        sqlite.lockAccount(username, 3);
+                        sqlite.addLogs("LOCK USER", user.getUsername(), user.getUsername() + " Locked User: " + username, new Timestamp(new Date().getTime()).toString());
+                    } else {
+                        sqlite.lockAccount(username, 0);
+                    }
+                } else if (confirm == JOptionPane.OK_CANCEL_OPTION) {
                 } else {
-                    sqlite.lockAccount(username, 0);
+                    JOptionPane.showMessageDialog(null, "wrong password", "ERROR", JOptionPane.ERROR_MESSAGE);
                 }
             }
         }

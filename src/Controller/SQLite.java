@@ -14,6 +14,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.net.InetAddress;
 import java.sql.PreparedStatement;
+import java.sql.Timestamp;
+import java.util.Date;
 
 public class SQLite {
 
@@ -169,9 +171,9 @@ public class SQLite {
         String sql = "INSERT INTO history(username,name,stock,price,timestamp) VALUES('" + username + "','" + name + "','" + stock + "','" + price + "','" + timestamp + "')";
 
         try (Connection conn = DriverManager.getConnection(driverURL);
-                Statement stmt = conn.createStatement()) {
-            stmt.execute(sql);
-        } catch (Exception ex) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.executeUpdate();
+        } catch (Exception ex) {/* Log: Log exception */
             ex.printStackTrace(pw);
             errorMessage = sw.toString(); // stack trace as a string
         }
@@ -181,11 +183,11 @@ public class SQLite {
         String sql = "INSERT INTO logs(event,username,desc,timestamp) VALUES('" + event + "','" + username + "','" + desc + "','" + timestamp + "')";
 
         try (Connection conn = DriverManager.getConnection(driverURL);
-                Statement stmt = conn.createStatement()) {
-            stmt.execute(sql);
-        } catch (Exception ex) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.executeUpdate();
+        } catch (Exception ex) {/* Log: Log exception */
             ex.printStackTrace(pw);
-            errorMessage = sw.toString(); // stack trace as a string
+            errorMessage = sw.toString();
         }
     }
 
@@ -193,45 +195,43 @@ public class SQLite {
         String sql = "INSERT INTO product(name,stock,price) VALUES('" + name + "','" + stock + "','" + price + "')";
 
         try (Connection conn = DriverManager.getConnection(driverURL);
-                Statement stmt = conn.createStatement()) {
-            stmt.execute(sql);
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.executeUpdate();
         } catch (Exception ex) {
             ex.printStackTrace(pw);
-            errorMessage = sw.toString(); // stack trace as a string        
+            errorMessage = sw.toString(); // stack trace as a string    
         }
+
     }
 
-    public void removeProduct(String productName) {
+    public void removeProduct(String productname) {
         String sql = "DELETE from product WHERE name = ?";
 
         try (Connection conn = DriverManager.getConnection(driverURL);
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, productName);
+            stmt.setString(1, productname);
             stmt.executeUpdate();
-
         } catch (Exception ex) {
+            /* Log: Log exception */
             ex.printStackTrace(pw);
-            errorMessage = sw.toString(); // stack trace as a string        
+            errorMessage = sw.toString(); // stack trace as a string  
         }
-
     }
 
-    public void addUser(String username, String password) {
-        String sql = "INSERT INTO users(username,password) VALUES('" + username + "','" + password + "')";
+    public boolean addUser(String username, String password) {
+        String sql = "INSERT INTO users(username,password) VALUES(?,?)";
 
         try (Connection conn = DriverManager.getConnection(driverURL);
-                Statement stmt = conn.createStatement()) {
-            stmt.execute(sql);
-
-//      PREPARED STATEMENT EXAMPLE
-//      String sql = "INSERT INTO users(username,password) VALUES(?,?)";
-//      PreparedStatement pstmt = conn.prepareStatement(sql)) {
-//      pstmt.setString(1, username);
-//      pstmt.setString(2, password);
-//      pstmt.executeUpdate();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, username);
+            stmt.setString(2, password);
+            stmt.executeUpdate();
+            return true;
         } catch (Exception ex) {
+            /* Log: Log exception */
             ex.printStackTrace(pw);
             errorMessage = sw.toString(); // stack trace as a string
+            return false;
         }
     }
 
@@ -255,6 +255,7 @@ public class SQLite {
             // Log: User attempt counter set to N
         }
     }
+
     public void updateLocked(String username, int locked) {
         String sql = "UPDATE users SET locked = ? WHERE username = ?";
         int result = 0;
@@ -275,7 +276,7 @@ public class SQLite {
             // Log: User attempt counter set to N
         }
     }
-    
+
     public ArrayList<History> getHistory() {
         String sql = "SELECT id, username, name, stock, price, timestamp FROM history";
         ArrayList<History> histories = new ArrayList<History>();
@@ -383,15 +384,21 @@ public class SQLite {
 //
 //        }
 //    }
-    public void addUser(String username, String password, int role) {
-        String sql = "INSERT INTO users(username,password,role) VALUES('" + username + "','" + password + "','" + role + "')";
+    public boolean addUser(String username, String password, int role) {
+        String sql = "INSERT INTO users(username,password,role) VALUES(?,?,?)";
 
         try (Connection conn = DriverManager.getConnection(driverURL);
-                Statement stmt = conn.createStatement()) {
-            stmt.execute(sql);
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, username);
+            stmt.setString(2, password);
+            stmt.setInt(3, role);
+            stmt.executeUpdate();
+            return true;
         } catch (Exception ex) {
+            /* Log: Log exception */
             ex.printStackTrace(pw);
             errorMessage = sw.toString(); // stack trace as a string
+            return false;
         }
     }
 
@@ -440,18 +447,12 @@ public class SQLite {
     }
 
     boolean checkExistingUsers(String username) {
-        String sql = "SELECT username FROM users";
-        ArrayList<User> users = new ArrayList<User>();
+        String sql = "SELECT username FROM ?";
 
         try (Connection conn = DriverManager.getConnection(driverURL);
-                Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, username);
 
-            while (rs.next()) {
-                if (username.equals(rs.getString("username"))) {
-                    return false;
-                }
-            }
             return true;
         } catch (Exception ex) {
             ex.printStackTrace(pw);

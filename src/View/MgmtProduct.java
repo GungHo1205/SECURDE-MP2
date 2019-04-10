@@ -64,16 +64,23 @@ public class MgmtProduct extends javax.swing.JPanel {
             editBtn.setVisible(false);
             deleteBtn.setVisible(false);
         }
-        if (user.getRole() == 3){
+        if (user.getRole() == 3) {
+            purchaseBtn.setVisible(false);
+            addBtn.setVisible(false);
+            editBtn.setVisible(false);
+            deleteBtn.setVisible(false);
+        }
+        if (user.getRole() == 4) {
             purchaseBtn.setVisible(false);
         }
-        if (user.getRole() == 4){
-            purchaseBtn.setVisible(false);
+        if (user.getRole() == 5) {
+            if (sqlite.DEBUG_MODE == 0) {
+                purchaseBtn.setVisible(false);
+            } else {
+                purchaseBtn.setVisible(true);
+            }
         }
-        if (user.getRole() == 5){
-            purchaseBtn.setVisible(false);
-        }
-        
+
     }
 
     public void designer(JTextField component, String text) {
@@ -212,17 +219,17 @@ public class MgmtProduct extends javax.swing.JPanel {
             if (result == JOptionPane.OK_OPTION) {
                 main.sanitize(stockFld.getText());
                 System.out.println(stockFld.getText());
-                if (main.validateIntSize(stockFld.getText())){
+                if (main.validateIntSize(stockFld.getText())) {
                     if (Integer.parseInt(stockFld.getText()) <= (Integer) tableModel.getValueAt(table.getSelectedRow(), 1)) {
                         int difference = (Integer) tableModel.getValueAt(table.getSelectedRow(), 1) - Integer.parseInt(main.sanitize(stockFld.getText()));
                         sqlite.updateProduct(main.sanitize((String) tableModel.getValueAt(table.getSelectedRow(), 0)), main.sanitize((String) tableModel.getValueAt(table.getSelectedRow(), 0)), difference, ((Float) tableModel.getValueAt(table.getSelectedRow(), 2)).doubleValue());
-                        sqlite.addHistory(user.getUsername(), (String)tableModel.getValueAt(table.getSelectedRow(),0), Integer.parseInt(stockFld.getText()), ((Float) tableModel.getValueAt(table.getSelectedRow(), 2)).doubleValue(), new Timestamp(new Date().getTime()).toString());
+                        sqlite.addHistory(user.getUsername(), (String) tableModel.getValueAt(table.getSelectedRow(), 0), Integer.parseInt(stockFld.getText()), ((Float) tableModel.getValueAt(table.getSelectedRow(), 2)).doubleValue(), new Timestamp(new Date().getTime()).toString());
                         sqlite.addLogs("NOTICE", user.getUsername(), user.getUsername() + " purchased product ", new Timestamp(new Date().getTime()).toString());
                         init(user);
                     } else {
                         JOptionPane.showMessageDialog(null, "You are buying more than the stock");
                     }
-                }else{
+                } else {
                     JOptionPane.showMessageDialog(null, "Invalid Input");
                 }
             }
@@ -250,7 +257,6 @@ public class MgmtProduct extends javax.swing.JPanel {
                 if (main.validateIntSize(stockFld.getText())) {
                     if (main.validateDoubleSize(priceFld.getText())) {
                         sqlite.addProduct(main.sanitize(nameFld.getText()), Integer.parseInt(main.sanitize(stockFld.getText())), Double.parseDouble(main.sanitize(priceFld.getText())));
-                        sqlite.addHistory(user.getUsername(), main.sanitize(nameFld.getText()), Integer.parseInt(main.sanitize(stockFld.getText())), Double.parseDouble(main.sanitize(priceFld.getText())), new Timestamp(new Date().getTime()).toString());
                         sqlite.addLogs("NOTICE", user.getUsername(), user.getUsername() + " added product " + main.sanitize(nameFld.getText()), new Timestamp(new Date().getTime()).toString());
                     } else {
                         if (sqlite.DEBUG_MODE == 0) { // not in debug mode{
@@ -309,7 +315,6 @@ public class MgmtProduct extends javax.swing.JPanel {
                 System.out.println(stockFld.getText());
                 System.out.println(priceFld.getText());
                 sqlite.updateProduct(main.sanitize((String) tableModel.getValueAt(table.getSelectedRow(), 0)), main.sanitize(nameFld.getText()), Integer.parseInt(main.sanitize(stockFld.getText())), Double.parseDouble(main.sanitize(priceFld.getText())));
-                sqlite.addHistory(user.getUsername(), main.sanitize(nameFld.getText()), Integer.parseInt(main.sanitize(stockFld.getText())), Double.parseDouble(main.sanitize(priceFld.getText())), new Timestamp(new Date().getTime()).toString());
 
                 if (tableModel.getValueAt(table.getSelectedRow(), 0) != nameFld.getText()) {
                     sqlite.addLogs("NOTICE", user.getUsername(), user.getUsername() + " edited product " + tableModel.getValueAt(table.getSelectedRow(), 0) + " to " + main.sanitize(nameFld.getText()), new Timestamp(new Date().getTime()).toString());

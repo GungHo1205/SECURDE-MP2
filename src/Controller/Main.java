@@ -135,7 +135,7 @@ public class Main extends Validation {
         return bytes;
     }
 
-    private String hashPassword(String password) {
+    public String hashPassword(String password) {
 
         try {
             int iterations = 1; // random number of iterations to perform
@@ -152,7 +152,7 @@ public class Main extends Validation {
         return null;
     }
 
-    private boolean validatePassword(String originalPassword, String storedPassword) { // check if equal password
+    public boolean validatePassword(String originalPassword, String storedPassword) { // check if equal password
         try {
             String[] parts = storedPassword.split(":");
             int iterations = Integer.parseInt(parts[0]);

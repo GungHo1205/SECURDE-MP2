@@ -13,6 +13,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -25,6 +26,7 @@ public class MgmtLogs extends javax.swing.JPanel {
     public DefaultTableModel tableModel;
     private User user;
     public Main main;
+
     public MgmtLogs(SQLite sqlite, Main main) {
         initComponents();
         this.sqlite = sqlite;
@@ -144,20 +146,36 @@ public class MgmtLogs extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void clearBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearBtnActionPerformed
-        main.copyFile();
-        JOptionPane.showMessageDialog(null, "The logs has been backed up in /dist");
-        sqlite.deleteLogsTable();
-        sqlite.addLogs("LOGS", user.getUsername(), user.getUsername() + " Cleared Logs ", new Timestamp(new Date().getTime()).toString());
+        JPasswordField pf = new JPasswordField();
+        int confirm = JOptionPane.showConfirmDialog(null, pf, "Enter Password", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (confirm == JOptionPane.OK_OPTION && main.validatePassword(main.sanitize((String.copyValueOf(pf.getPassword()))), user.getPassword())) {
+            main.copyFile();
+            JOptionPane.showMessageDialog(null, "The logs has been backed up in /dist");
+            sqlite.deleteLogsTable();
+            sqlite.addLogs("LOGS", user.getUsername(), user.getUsername() + " Cleared Logs ", new Timestamp(new Date().getTime()).toString());
+            init(user);
+        } else if (confirm == JOptionPane.OK_CANCEL_OPTION) {
+        } else {
+            JOptionPane.showMessageDialog(null, "wrong password", "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
         init(user);
     }//GEN-LAST:event_clearBtnActionPerformed
 
     private void debugBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_debugBtnActionPerformed
-        sqlite.addLogs("DEBUG", user.getUsername(), user.getUsername() + " Debug Toggled ", new Timestamp(new Date().getTime()).toString());
-        if (sqlite.DEBUG_MODE == 1) {
-            sqlite.DEBUG_MODE = 0;
+        JPasswordField pf = new JPasswordField();
+        int confirm = JOptionPane.showConfirmDialog(null, pf, "Enter Password", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (confirm == JOptionPane.OK_OPTION && main.validatePassword(main.sanitize((String.copyValueOf(pf.getPassword()))), user.getPassword())) {
+            sqlite.addLogs("DEBUG", user.getUsername(), user.getUsername() + " Debug Toggled " + sqlite.DEBUG_MODE, new Timestamp(new Date().getTime()).toString());
+            if (sqlite.DEBUG_MODE == 1) {
+                sqlite.DEBUG_MODE = 0;
+            } else {
+                sqlite.DEBUG_MODE = 1;
+            }
+        } else if (confirm == JOptionPane.OK_CANCEL_OPTION) {
         } else {
-            sqlite.DEBUG_MODE = 1;
+            JOptionPane.showMessageDialog(null, "wrong password", "ERROR", JOptionPane.ERROR_MESSAGE);
         }
+        init(user);
     }//GEN-LAST:event_debugBtnActionPerformed
 
 
